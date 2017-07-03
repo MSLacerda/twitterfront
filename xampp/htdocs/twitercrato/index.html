@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="pt">
+
+<head>
+    <title></title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="css/style.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ"
+        crossorigin="anonymous">
+    <link href="http://netdna.bootstrapcdn.com/font-awesome/3.2.1/css/font-awesome.css" rel="stylesheet">
+
+</head>
+
+<style>
+    .jumbotron {
+        top: 120px;
+        z-index: 99;
+        padding-top: 0;
+        position: relative;
+        border-radius: 0;
+        margin: 0 auto;
+        background-color: white;
+        color: black;
+    }
+
+    main {
+        margin-top: 50px;
+    }
+
+    img.twitter {
+        position: relative;
+        z-index: 999;
+        vertical-align: left;
+        margin-left: 37%;
+        margin-bottom: 0;
+        top: -85px;
+        border: 1px solid white;
+        border-radius: 200px;
+    }
+
+    #arrow-to-down {
+        z-index: 9999;
+        position: relative;
+    }
+
+    .row .head-div {
+        right: 0;
+        z-index: -999;
+        position: absolute;
+        height: 200px;
+        background-color: #37ceee;
+    }
+</style>
+
+<body style="background-color: #e6e7e7;">
+    <div class="row">
+        <div class="col-xl-12 head-div">
+        </div>
+    </div>
+    <header class="row">
+        <div class="jumbotron col-xl-6">
+            <img src="img/Twitter.png" height="180" width="180" class="twitter">
+
+            <h1 class="display-3">Olá!</h1>
+            <p class="lead">Este é um projeto da disciplina: Banco de Dados 2, tal projeto consiste em recuperar e atribuir um top 10 as
+                palavras mais utilizadas sobre a cidade de Crato.
+            </p>
+            <hr class="my-4">
+
+            <h2 id="arrow-to-down" style="text-align:center;"><button id="toDown" type="button" class="btn btn-secondary"><i class="icon-arrow-down"></i></button>
+            </h2>
+
+        </div>
+    </header>
+
+
+    <main class="row">
+        <div class="jumbotron col-xl-6">
+            <hr class="my-4">
+            <div class="alert alert-warning" role="alert">
+                <strong>Vamos lá!</strong> Aqui você verá o top 10.
+            </div>
+            <hr class="my-4">
+            <ul class="list-group" id="tweets">
+                <li class="list-group-item list-group-item-action flex-column align-items-start list-group-item-info">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Tweets</h5>
+                    </div>
+                </li>
+            </ul>
+            <div class="row">
+
+                <div id="main" style="width: 350px;height:250px; margin-left: 5%;"></div>
+
+
+            </div>
+        </div>
+
+
+
+        <div class="jumbotron col-xl-6">
+            <hr class="my-4">
+            <div class="alert alert-warning" role="alert">
+                <strong>Vamos lá!</strong> Aqui você acompanha em tempo real.
+            </div>
+            <hr class="my-4">
+            <ul class="list-group" id="live">
+                <li class="list-group-item list-group-item-action list-group-item-success flex-column align-items-start ">
+                    <div class="d-flex w-100 justify-content-between">
+                        <h5 class="mb-1">Live</h5>
+                    </div>
+                </li>
+            </ul>
+        </div>
+    </main>
+
+    <script src="https://code.jquery.com/jquery-3.2.1.min.js" integrity="sha256-hwg4gsxgFZhOsEEamdOYGBf13FyQuiTwlAQgxVSNgt4="
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb"
+        crossorigin="anonymous"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn"
+        crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.0.3/socket.io.js"></script>
+    <script src="http://echarts.baidu.com/dist/echarts.min.js">
+
+    </script>
+    <script>
+        $(document).ready(function () {
+
+            var baseUTL = "http://localhost:5000/";
+            var body = $("html, body");
+
+            var myChart = echarts.init(document.getElementById('main'));
+
+            var data = new Array();
+
+            // specify chart configuration item and data
+
+
+            $("#toDown").click(function () {
+                body.stop().animate({ scrollTop: 700 }, 500, 'swing', function () {
+
+                });
+            })
+
+
+
+            $.ajax({
+                url: baseUTL + "data", success: function (result) {
+                    console.log(result);
+                    $(".remove").fadeOut(3000, function () { $(".remove").remove(); });
+                    for (var i = 0; i < result.length; i++) {
+                        var txt = '<li class="remove list-group-item list-group-item-action flex-column align-items-start">' +
+                            '<div class="d-flex w-100 justify-content-between">' +
+                            '<h5 class="mb-1">' + (i + 1) + '</h5>' +
+                            '<small class="text-muted">' + result[i].recommendCount + '</small>' +
+                            '</div>' +
+                            '<p class="mb-1">' + result[i]._id + '</p>' +
+                            '<small class="text-muted">Twitter sobre o Crato</small>' +
+                            '</li>'
+                        data.push({
+                            value: result[i].recommendCount * 10,
+                            name: result[i]._id
+                        })
+                        $("#tweets").append(txt).children(':last').hide().fadeIn(2000);
+                    }
+                }
+            });
+
+
+            var socket = io(baseUTL);
+
+            socket.on("update", function () {
+                $.ajax({
+                    url: baseUTL + "tweets", success: function (result) {
+                        console.log(result);
+                    }
+                });
+            })
+
+            socket.on("tweet", function (msg) {
+                var n = $("#live").length;
+                console.log(n);
+                var text = '<li class="list-group-item list-group-item-action flex-column align-items-start">' +
+                    '<div class="col-xl-3 d-flex w-100 justify-content-between">' +
+                    '<small class="text-muted"></small>' +
+                    '</div>' +
+                    '<div class="row"><div class="col-xl-2 col-md-2 col-sm-2">' +
+                    '<img src="' + msg.user.profile_image_url + '" class="rounded-circle tweet-img" height="75" width="75" alt=""> </div>' +
+                    '<div class="col-xl-10 col-md-10 col-sm-10"><p class="mb-1">' + msg.text + '</p> </div> </div>' +
+                    '<small class="text-muted">' + msg.created_at + ' por ' + msg.user.name + '</small>' +
+                    '</li>'
+
+                $("#live").append(text).children(':last').hide().fadeIn(2000);
+            })
+
+            socket.on("get", function (msg) {
+                $.ajax({
+                    url: baseUTL + "data", success: function (result) {
+
+                        $(".remove").remove();
+                        data = [];
+                        for (var i = 0; i < result.length; i++) {
+                            var txt = '<li class="remove list-group-item list-group-item-action flex-column align-items-start">' +
+                                '<div class="d-flex w-100 justify-content-between">' +
+                                '<h5 class="mb-1">' + (i + 1) + '</h5>' +
+                                '<small class="text-muted">' + result[i].recommendCount + '</small>' +
+                                '</div>' +
+                                '<p class="mb-1">' + result[i]._id + '</p>' +
+                                '<small class="text-muted">Twitter sobre o Crato</small>' +
+                                '</li>'
+                            $("#tweets").append(txt);
+                            data.push({
+                                value: result[i].recommendCount * 10,
+                                name: result[i]._id 
+                            })
+                        }
+                        myChart.setOption({
+                            series: [
+                                {
+                                    name: 'Reference Page',
+                                    type: 'pie',
+                                    radius: '55%',
+                                    data: data
+                                }
+                            ]
+                        })
+                        
+                    }
+                });
+            })
+            socket.on('clear', function () {
+                 $.ajax({
+                    url: baseUTL + "clear", success: function (result) {
+                        console.log(result);
+                    }
+                });
+            })
+        });
+    </script>
+</body>
+
+</html>
